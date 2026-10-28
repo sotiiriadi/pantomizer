@@ -77,7 +77,7 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
   flex: none; display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 12px 0 0;
   background: var(--bg); color: var(--ink); border: 1px solid var(--ink); cursor: pointer; white-space: nowrap; font: 500 14px var(--font);
 }
-.chip i { display: block; width: 40px; align-self: stretch; margin: -1px 0 -1px -1px; border-right: 1px solid var(--ink); }
+.chip i { display: block; width: 40px; align-self: stretch; margin: 0; border-right: 1px solid var(--ink); }
 .chip small { font: 500 11px var(--mono); opacity: .7; }
 .chip.sel { background: var(--ink); color: var(--bg); }
 .chip.all { padding: 0 14px; background: var(--block); }
@@ -85,20 +85,23 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
 /* Нижняя панель */
 .dock { flex: none; border-top: 1px solid var(--ink); }
 .zoom { display: grid; grid-template-columns: 52px minmax(0, 1fr) 52px; align-items: center; background: var(--block-2); border-bottom: 1px solid var(--ink); }
-.zoom button { height: 48px; border: 0; background: transparent; font: 400 26px/1 var(--mono); cursor: pointer; }
+.zoom button { display: grid; place-items: center; height: 48px; padding: 0; border: 0; background: transparent; color: var(--ink); cursor: pointer; }
 .size { -webkit-appearance: none; appearance: none; width: 100%; height: 48px; margin: 0; background: transparent; cursor: pointer; }
 .size::-webkit-slider-runnable-track { height: 1px; background: var(--ink); }
 .size::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 18px; margin-top: -18px; background: var(--ink); clip-path: polygon(0 0, 100% 0, 50% 100%); border: 0; }
 .size::-moz-range-track { height: 1px; background: var(--ink); }
 .size::-moz-range-thumb { width: 20px; height: 18px; background: var(--ink); border: 0; border-radius: 0; clip-path: polygon(0 0, 100% 0, 50% 100%); transform: translateY(-9px); }
+.ic { display: block; width: 28px; height: 28px; fill: currentColor; flex: none; pointer-events: none; }
 .shutter-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 12px 16px; }
 .thumb { position: relative; justify-self: start; width: 58px; height: 58px; padding: 0; border: 1px solid var(--ink); background: var(--block); cursor: pointer; overflow: hidden; }
 .thumb-grid { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
 .thumb-grid i { display: block; }
 .thumb small { position: absolute; right: 0; bottom: 0; padding: 3px 5px; background: var(--ink); color: var(--bg); font: 700 11px/1 var(--mono); }
-.thumb em { position: absolute; inset: 0; display: grid; place-items: center; font: 400 22px var(--mono); font-style: normal; }
+.thumb em { position: absolute; inset: 0; display: grid; place-items: center; }
 .shutter { width: 80px; height: 80px; padding: 6px; border: 3px solid var(--ink); background: transparent; cursor: pointer; }
-.shutter i { display: grid; place-items: center; width: 100%; height: 100%; background: var(--ink); color: var(--bg); font: 400 30px/1 var(--mono); font-style: normal; }
+.shutter i { display: grid; place-items: center; width: 100%; height: 100%; background: var(--ink); color: var(--bg); }
+.shutter i .ic { display: none; width: 32px; height: 32px; }
+.shutter.again i .ic { display: block; }
 .shutter:active i { opacity: .7; }
 .shutter.again i { background: var(--block); color: var(--ink); }
 .rside { justify-self: end; display: flex; gap: 8px; }
@@ -114,9 +117,9 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
 }
 @keyframes up { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
 .sheet-in { max-width: 560px; margin: 0 auto; }
-.sheet-head { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0 6px; background: var(--bg); }
+.sheet-head { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 -16px; padding: 8px 16px 8px; background: var(--bg); }
 .cap { margin: 0; font: 500 11px/1.3 var(--mono); letter-spacing: .07em; text-transform: uppercase; }
-.x { width: 44px; height: 44px; border: 0; background: var(--block); font: 400 24px/1 var(--mono); cursor: pointer; }
+.x { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; background: var(--block); cursor: pointer; }
 .sw2 { display: grid; grid-template-columns: 1fr 1fr; height: 72px; margin-top: 8px; box-shadow: 0 0 0 1px var(--ink); }
 .sw2 div { display: flex; align-items: flex-end; padding: 8px; font: 700 11px var(--mono); }
 .sh-name { margin: 12px 0 0; font: 500 clamp(24px, 7vw, 30px)/1.1 var(--font); letter-spacing: -.01em; overflow-wrap: anywhere; }
@@ -155,7 +158,7 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
 }
 .pal-in { max-width: 560px; margin: 0 auto; }
 .pal-head { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 12px; margin-bottom: 12px; }
-.back { min-height: 48px; padding: 0 16px; border: 0; background: var(--block); font: 500 15px var(--font); cursor: pointer; }
+.back { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 16px 0 12px; border: 0; background: var(--block); font: 500 15px var(--font); cursor: pointer; }
 .empty { margin: 0; padding: 14px; background: var(--block-2); border: 1px solid var(--ink); font-size: 14px; }
 .pal { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--ink); border-left: 1px solid var(--ink); }
 .tile { position: relative; background: var(--bg); min-width: 0; border-right: 1px solid var(--ink); border-bottom: 1px solid var(--ink); }
@@ -164,11 +167,13 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
 .tile-t { display: block; padding: 8px 10px 10px; }
 .tile-t b { display: block; font: 500 15px var(--font); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tile-t span { display: block; font: 400 12px var(--mono); color: var(--ink-2); }
-.tile-del { position: absolute; top: 0; right: 0; width: 40px; height: 40px; border: 0; background: var(--bg); color: var(--ink); font: 400 20px/1 var(--mono); cursor: pointer; }
+.tile-del { position: absolute; top: 0; right: 0; display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; background: var(--bg); color: var(--ink); cursor: pointer; }
 .row2 { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 1px; margin-top: 12px; background: var(--ink); }
 .toast { position: fixed; left: 50%; transform: translateX(-50%); top: calc(env(safe-area-inset-top, 0px) + 8px); z-index: 40; max-width: 92%; padding: 9px 12px; background: var(--ink); color: var(--bg); font: 500 12px/1.3 var(--mono); }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><symbol id="i-switch" viewBox="0 -960 960 960"><path d="M313-294q-24.75 0-42.37-17.63Q253-329.25 253-354v-252q0-24.75 17.63-42.38Q288.25-666 313-666h45l30-30h187l30 30h45q24.75 0 42.38 17.62Q710-630.75 710-606v252q0 24.75-17.62 42.37Q674.75-294 650-294H313Zm0-60h337v-252H313v252Zm168.18-65q24.82 0 42.32-17.68 17.5-17.67 17.5-42.5 0-24.82-17.68-42.32-17.67-17.5-42.5-17.5-24.82 0-42.32 17.68-17.5 17.67-17.5 42.5 0 24.82 17.68 42.32 17.67 17.5 42.5 17.5ZM370-947q27.35-7.15 55.1-10.08Q452.85-960 481-960q93 0 177 33.5t148.5 92.68Q871-774.64 912-694.57T961-522h-60q-6-78-40-145.5t-87.5-118Q720-836 650-866.5T502-901l76 76-43 43-165-165ZM591-13q-27.1 7.15-54.6 10.08Q508.9 0 481 0q-94 0-177.5-33.5t-148.31-92.57q-64.8-59.08-106-139.01Q8-345-1-438h60.91Q66-360 100-292.5t87.5 118Q241-124 311-93.5T459-59l-76-76 43-43L591-13ZM482-480Z"/></symbol><symbol id="i-photo" viewBox="0 -960 960 960"><path d="M480-480ZM180-120q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h365v60H180v600h600v-365h60v365q0 24-18 42t-42 18H180Zm60-162h480L576-474 449-307l-94-124-115 149Zm453-323v-87h-88v-60h88v-88h60v88h87v60h-87v87h-60Z"/></symbol><symbol id="i-x" viewBox="0 -960 960 960"><path d="m249-207-42-42 231-231-231-231 42-42 231 231 231-231 42 42-231 231 231 231-42 42-231-231-231 231Z"/></symbol><symbol id="i-add" viewBox="0 -960 960 960"><path d="M450-450H200v-60h250v-250h60v250h250v60H510v250h-60v-250Z"/></symbol><symbol id="i-rem" viewBox="0 -960 960 960"><path d="M200-450v-60h560v60H200Z"/></symbol><symbol id="i-back" viewBox="0 -960 960 960"><path d="m274-450 248 248-42 42-320-320 320-320 42 42-248 248h526v60H274Z"/></symbol><symbol id="i-redo" viewBox="0 -960 960 960"><path d="M480-160q-133 0-226.5-93.5T160-480q0-133 93.5-226.5T480-800q85 0 149 34.5T740-671v-129h60v254H546v-60h168q-38-60-97-97t-137-37q-109 0-184.5 75.5T220-480q0 109 75.5 184.5T480-220q83 0 152-47.5T728-393h62q-29 105-115 169t-195 64Z"/></symbol><symbol id="i-pal" viewBox="0 -960 960 960"><path d="M480-80q-82 0-155-31.5t-127.5-86Q143-252 111.5-325T80-480q0-85 32-158t87.5-127q55.5-54 130-84.5T489-880q79 0 150 26.5T763.5-780q53.5 47 85 111.5T880-527q0 108-63 170.5T650-294h-75q-18 0-31 14t-13 31q0 27 14.5 46t14.5 44q0 38-21 58.5T480-80Zm0-400Zm-198 11q15-15 15-35t-15-35q-15-15-35-15t-35 15q-15 15-15 35t15 35q15 15 35 15t35-15Zm126-170q15-15 15-35t-15-35q-15-15-35-15t-35 15q-15 15-15 35t15 35q15 15 35 15t35-15Zm214 0q15-15 15-35t-15-35q-15-15-35-15t-35 15q-15 15-15 35t15 35q15 15 35 15t35-15Zm131 170q15-15 15-35t-15-35q-15-15-35-15t-35 15q-15 15-15 35t15 35q15 15 35 15t35-15ZM480-140q11 0 15.5-4.5T500-159q0-14-14.5-26T471-238q0-46 30-81t76-35h73q76 0 123-44.5T820-527q0-132-100-212.5T489-820q-146 0-247.5 98.5T140-480q0 141 99.5 240.5T480-140Z"/></symbol></svg>
 
 <div class="app" id="app">
   <div class="finder" id="finder" tabindex="0" role="application" aria-label="Кадр из пикселей. Коснитесь пикселя, чтобы узнать название цвета. Стрелки двигают выбор.">
@@ -188,20 +193,16 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
 
   <footer class="dock" id="dock">
     <div class="zoom">
-      <button id="zMinus" type="button" aria-label="Пиксели мельче">−</button>
+      <button id="zMinus" type="button" aria-label="Пиксели мельче"><svg class="ic" aria-hidden="true"><use href="#i-rem"/></svg></button>
       <input class="size" id="size" type="range" min="0" max="14" step="1" value="9" aria-label="Размер пикселя">
-      <button id="zPlus" type="button" aria-label="Пиксели крупнее">+</button>
+      <button id="zPlus" type="button" aria-label="Пиксели крупнее"><svg class="ic" aria-hidden="true"><use href="#i-add"/></svg></button>
     </div>
     <div class="shutter-row">
-      <button class="thumb" id="btnPal" type="button" aria-label="Сохранённые цвета"><span class="thumb-grid" id="thumb"></span><em id="thumbEmpty">▦</em><small id="palCount" hidden></small></button>
-      <button class="shutter" id="btnShot" type="button" aria-label="Включить камеру"><i id="shotIcon"></i></button>
+      <button class="thumb" id="btnPal" type="button" aria-label="Сохранённые цвета"><span class="thumb-grid" id="thumb"></span><em id="thumbEmpty"><svg class="ic" aria-hidden="true"><use href="#i-pal"/></svg></em><small id="palCount" hidden></small></button>
+      <button class="shutter" id="btnShot" type="button" aria-label="Включить камеру"><i id="shotIcon"><svg class="ic" aria-hidden="true"><use href="#i-redo"/></svg></i></button>
       <div class="rside">
-      <button class="flip" id="btnUpload2" type="button" aria-label="Загрузить фото">
-        <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M3.5 4.5h17v15h-17z"/><path d="M3.5 16l5-5 4 4 3-3 5 5"/><circle cx="15.5" cy="8.5" r="1.3"/></svg>
-      </button>
-      <button class="flip" id="btnFlip" type="button" aria-label="Перевернуть камеру">
-        <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M20 9A8 8 0 0 0 5.4 6.6M4 3.5V8h4.5"/><path d="M4 15a8 8 0 0 0 14.6 2.4M20 20.5V16h-4.5"/></svg>
-      </button>
+      <button class="flip" id="btnUpload2" type="button" aria-label="Загрузить фото"><svg class="ic" aria-hidden="true"><use href="#i-photo"/></svg></button>
+      <button class="flip" id="btnFlip" type="button" aria-label="Перевернуть камеру"><svg class="ic" aria-hidden="true"><use href="#i-switch"/></svg></button>
       </div>
     </div>
   </footer>
@@ -210,7 +211,7 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
 <section class="palscreen" id="palscreen" hidden aria-label="Сохранённые цвета">
   <div class="pal-in">
     <div class="pal-head">
-      <button class="back" id="btnBack" type="button">← Камера</button>
+      <button class="back" id="btnBack" type="button"><svg class="ic" aria-hidden="true"><use href="#i-back"/></svg><span>Камера</span></button>
       <p class="cap" id="palTitle">■ Сохранённые цвета</p>
     </div>
     <p class="empty" id="palEmpty">Пока пусто. Сохраняйте цвета из карточки пикселя или кнопкой «Сохранить все» под кадром.</p>
@@ -226,7 +227,7 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
   <div class="sheet-in">
     <div class="sheet-head">
       <p class="cap" id="shTitle">■ Пиксель</p>
-      <button class="x" id="btnShClose" type="button" aria-label="Закрыть">×</button>
+      <button class="x" id="btnShClose" type="button" aria-label="Закрыть"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
     </div>
     <div class="sw2" id="shSw2">
       <div id="shSwL"><span id="shLblL">Пиксель</span></div>
@@ -363,7 +364,7 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
     sctx.setTransform(SW / cw, 0, 0, SH / ch, 0, 0);
     var sc = Math.max(cw / s.w, ch / s.h), dw = s.w * sc, dh = s.h * sc;
     if (s.mirror) { sctx.translate(cw, 0); sctx.scale(-1, 1); }
-    sctx.imageSmoothingQuality = "high";
+    sctx.imageSmoothingQuality = s.el === video ? "low" : "high";
     sctx.drawImage(s.el, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
     sctx.setTransform(1, 0, 0, 1, 0, 0);
     var d; try { d = sctx.getImageData(0, 0, SW, SH).data; } catch (e) { return false; }
@@ -635,7 +636,6 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
     $("start").hidden = has(); $("dock").hidden = !has();
     var sh = $("btnShot"); sh.className = "shutter" + (again ? " again" : "");
     sh.setAttribute("aria-label", !stream ? "Включить камеру" : live ? "Снять кадр" : "Снять заново");
-    $("shotIcon").textContent = again ? "↺" : "";
   }
   function stopStream() {
     cancelAnimationFrame(rafId);
@@ -647,7 +647,7 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
     try {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error("no-media");
       stopStream();
-      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: facing }, width: { ideal: 1280 }, height: { ideal: 1280 } }, audio: false });
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: facing }, width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 30, max: 30 } }, audio: false });
       video.srcObject = stream; await video.play();
       var tr = stream.getVideoTracks()[0], st = tr && tr.getSettings ? tr.getSettings() : {};
       liveSrc = { el: video, w: video.videoWidth || 1280, h: video.videoHeight || 960, mirror: st.facingMode === "user" };
@@ -742,7 +742,7 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
       var b1 = document.createElement("b"); b1.textContent = p[1]; var s1 = document.createElement("span"); s1.textContent = "#" + p[2].toUpperCase();
       t.appendChild(b1); t.appendChild(s1); b.appendChild(sw); b.appendChild(t);
       b.addEventListener("click", function () { openFree(byTcx.get(tcx)); });
-      var del = document.createElement("button"); del.type = "button"; del.className = "tile-del"; del.textContent = "×"; del.setAttribute("aria-label", "Убрать " + p[1]);
+      var del = document.createElement("button"); del.type = "button"; del.className = "tile-del"; del.innerHTML = '<svg class="ic" aria-hidden="true"><use href="#i-x"/></svg>'; del.setAttribute("aria-label", "Убрать " + p[1]);
       del.addEventListener("click", function () { saved = saved.filter(function (x) { return x !== tcx; }); persist(); renderPalette(); });
       cell.appendChild(b); cell.appendChild(del); gridEl.appendChild(cell);
     });
