@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<style>:root{padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}</style>
+<style>:root{padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px);background:#0F0F11}</style>
 <title>Пипетка Pantone</title>
-<meta name="color-scheme" content="light dark">
+<meta name="color-scheme" content="dark">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Onest:wght@400;500;600&display=swap">
@@ -14,29 +14,6 @@
    снизу закреплена панель: размер пикселя, миниатюра палитры, затвор, переворот камеры.
    Интерфейс только серый и чёрный, цвет живёт в пикселях и на образцах Pantone. */
 :root {
-  --bg: #EFEFF1;
-  --grid: #DEDEE2;
-  --block: #D2D2D6;
-  --block-2: #E3E3E6;
-  --ink: #0C0C0E;
-  --ink-2: #55555C;
-  --view: #0C0C0E;
-  --font: "Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #0F0F11;
-    --grid: #1F1F23;
-    --block: #2C2C31;
-    --block-2: #1A1A1E;
-    --ink: #F1F1F3;
-    --ink-2: #A0A0A9;
-    --view: #050506;
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
   --bg: #0F0F11;
   --grid: #1F1F23;
   --block: #2C2C31;
@@ -44,6 +21,8 @@
   --ink: #F1F1F3;
   --ink-2: #A0A0A9;
   --view: #050506;
+  --font: "Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -122,7 +101,8 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
 .shutter i { display: grid; place-items: center; width: 100%; height: 100%; background: var(--ink); color: var(--bg); font: 400 30px/1 var(--mono); font-style: normal; }
 .shutter:active i { opacity: .7; }
 .shutter.again i { background: var(--block); color: var(--ink); }
-.flip { justify-self: end; width: 58px; height: 58px; padding: 0; border: 0; background: var(--block); cursor: pointer; display: grid; place-items: center; }
+.rside { justify-self: end; display: flex; gap: 8px; }
+.flip { width: 58px; height: 58px; padding: 0; border: 0; background: var(--block); cursor: pointer; display: grid; place-items: center; }
 .flip:active { background: var(--ink); color: var(--bg); }
 
 /* Шторка с данными цвета */
@@ -215,9 +195,14 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
     <div class="shutter-row">
       <button class="thumb" id="btnPal" type="button" aria-label="Сохранённые цвета"><span class="thumb-grid" id="thumb"></span><em id="thumbEmpty">▦</em><small id="palCount" hidden></small></button>
       <button class="shutter" id="btnShot" type="button" aria-label="Включить камеру"><i id="shotIcon"></i></button>
+      <div class="rside">
+      <button class="flip" id="btnUpload2" type="button" aria-label="Загрузить фото">
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M3.5 4.5h17v15h-17z"/><path d="M3.5 16l5-5 4 4 3-3 5 5"/><circle cx="15.5" cy="8.5" r="1.3"/></svg>
+      </button>
       <button class="flip" id="btnFlip" type="button" aria-label="Перевернуть камеру">
         <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M20 9A8 8 0 0 0 5.4 6.6M4 3.5V8h4.5"/><path d="M4 15a8 8 0 0 0 14.6 2.4M20 20.5V16h-4.5"/></svg>
       </button>
+      </div>
     </div>
   </footer>
 </div>
@@ -343,7 +328,7 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
   var sampleCanvas = document.createElement("canvas"), sctx = sampleCanvas.getContext("2d", { willReadFrequently: true });
 
   var grid = { cols: 8, rows: 12, SW: 0, SH: 0 }, cellRGB = null, cellP = null;
-  var stream = null, showing = "still", kind = "demo", facing = "environment", rafId = 0, lastT = 0, wantCam = false, photoMode = false;
+  var frameGap = 50, sizeDirty = false, saveTimer = 0, stream = null, showing = "still", kind = "demo", facing = "environment", rafId = 0, lastT = 0, wantCam = false, photoMode = false;
   function has() { return !!stream || photoMode; }
   var staticSrc = null, liveSrc = null;
   var sizeStep = null, sel = null, selIdx = null, found = [], sheetKey = "", pick = null, panY = 0;
@@ -368,7 +353,7 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
     if (v !== undefined) return v;
     var lab = labFromRgb((R & 248) + 4, (G & 248) + 4, (B & 248) + 4);
     v = index.nearest(lab[0], lab[1], lab[2], 1)[0].i;
-    if (cache.size > 30000) cache.clear();
+    if (cache.size > 40000) cache.clear();
     cache.set(key, v); return v;
   }
   function computeCells(s) {
@@ -607,9 +592,12 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
   }
   function frame(t) {
     if (!stream || showing !== "live") return;
-    if (video.readyState >= 2 && video.videoWidth && t - lastT > 50) {
+    if (video.readyState >= 2 && video.videoWidth && t - lastT > frameGap) {
       lastT = t; liveSrc.w = video.videoWidth; liveSrc.h = video.videoHeight;
+      var t0 = performance.now();
       if (computeCells(liveSrc)) { draw(); if (sel) renderSheet(false); }
+      // Если кадр обрабатывается долго (мелкие пиксели), реже его обновляем, чтобы интерфейс не залипал.
+      frameGap = Math.max(50, Math.min(250, (performance.now() - t0) * 3));
     }
     rafId = requestAnimationFrame(frame);
   }
@@ -624,14 +612,20 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
   }
   if (window.ResizeObserver) new ResizeObserver(resize).observe(finder); else window.addEventListener("resize", resize);
   function setSize(step) {
-    sizeStep = Math.max(0, Math.min(MAXS, step));
-    try { localStorage.setItem("pe-size2", String(sizeStep)); } catch (e) {}
-    dropSelection(); resize();
+    step = Math.max(0, Math.min(MAXS, step));
+    if (step === sizeStep && !sizeDirty) return;
+    sizeStep = step; $("size").value = String(step);
+    clearTimeout(saveTimer); saveTimer = setTimeout(function () { try { localStorage.setItem("pe-size2", String(sizeStep)); } catch (e) {} }, 300);
+    if (!sizeDirty) { sizeDirty = true; requestAnimationFrame(applySize); }
+  }
+  // Меняем только сетку: холст не пересоздаём, несколько движений ползунка за кадр сливаем в одно.
+  function applySize() {
+    sizeDirty = false; dropSelection(); layoutGrid(); frameGap = 50;
+    if (stream && showing === "live") { if (computeCells(liveSrc)) draw(); } else refreshStill();
   }
   $("size").addEventListener("input", function (e) { setSize(parseInt(e.target.value, 10)); });
   $("zMinus").addEventListener("click", function () { setSize((sizeStep === null ? 9 : sizeStep) - 1); });
   $("zPlus").addEventListener("click", function () { setSize((sizeStep === null ? 9 : sizeStep) + 1); });
-  try { window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () { draw(); }); } catch (e) {}
 
   /* ---------- Камера ---------- */
   function setView() {
@@ -685,6 +679,7 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
   }
   $("btnStart").addEventListener("click", startCamera);
   $("btnUpload").addEventListener("click", function () { $("fileIn").click(); });
+  $("btnUpload2").addEventListener("click", function () { $("fileIn").click(); });
   $("fileIn").addEventListener("change", async function (e) {
     var f = e.target.files && e.target.files[0]; if (!f) return;
     try {
