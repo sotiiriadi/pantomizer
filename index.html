@@ -128,7 +128,7 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
 /* Шторка с данными цвета */
 .sheet {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; max-height: 62vh; overflow: auto;
-  background: var(--bg); border-top: 3px solid var(--ink);
+  background: var(--bg); border-top: 3px solid var(--ink); overscroll-behavior: contain; -webkit-overflow-scrolling: touch; touch-action: pan-y;
   padding: 0 16px calc(14px + env(safe-area-inset-bottom, 0px));
   animation: up .16s ease-out;
 }
@@ -196,7 +196,7 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
     <span class="tag badge" id="badge">Пример</span>
     <p class="tag hint" id="hint">Коснитесь пикселя, чтобы узнать цвет</p>
     <div class="start" id="start">
-      <button class="btn start-btn" id="btnStart" type="button">Включить пантомизатор</button>
+      <button class="btn start-btn" id="btnStart" type="button">Включить камеру</button>
       <button class="btn start-btn upload-btn" id="btnUpload" type="button">Загрузить фото</button>
       <input type="file" id="fileIn" accept="image/*" hidden>
       <p class="tag" id="startNote" hidden></p>
@@ -206,7 +206,7 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
     <video id="cam" class="cam" playsinline muted autoplay></video>
   </div>
 
-  <footer class="dock">
+  <footer class="dock" id="dock">
     <div class="zoom">
       <button id="zMinus" type="button" aria-label="Пиксели мельче">−</button>
       <input class="size" id="size" type="range" min="0" max="14" step="1" value="9" aria-label="Размер пикселя">
@@ -214,7 +214,7 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
     </div>
     <div class="shutter-row">
       <button class="thumb" id="btnPal" type="button" aria-label="Сохранённые цвета"><span class="thumb-grid" id="thumb"></span><em id="thumbEmpty">▦</em><small id="palCount" hidden></small></button>
-      <button class="shutter" id="btnShot" type="button" aria-label="Включить пантомизатор"><i id="shotIcon"></i></button>
+      <button class="shutter" id="btnShot" type="button" aria-label="Включить камеру"><i id="shotIcon"></i></button>
       <button class="flip" id="btnFlip" type="button" aria-label="Перевернуть камеру">
         <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M20 9A8 8 0 0 0 5.4 6.6M4 3.5V8h4.5"/><path d="M4 15a8 8 0 0 0 14.6 2.4M20 20.5V16h-4.5"/></svg>
       </button>
@@ -506,7 +506,8 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
       used.add(best.i); return { i: best.i, label: d[1] };
     });
   }
-  function fillCommon(ti, la) {
+  var listKey = "";
+  function fillCommon(ti, la, reset) {
     var p = PANTONE[ti], pr = hex6(p[2]), lb = labFromHex(p[2]);
     pick = { idx: ti };
     $("shName").textContent = p[1]; $("shHex").textContent = "#" + p[2].toUpperCase();
@@ -535,7 +536,7 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
       bt.addEventListener("click", function () { openFree(h.i); });
       box.appendChild(bt);
     });
-    sheet.scrollTop = 0;
+    if (reset) sheet.scrollTop = 0;
   }
   function renderSheet(force) {
     if (!sel || !cellRGB || viewIdx !== null) return;
@@ -552,7 +553,8 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
     $("shSwR").style.background = "#" + ph; $("shSwR").style.color = inkOn(pr[0], pr[1], pr[2]); $("shLblR").textContent = "Pantone #" + ph;
     $("vDe").textContent = de.toFixed(1);
     $("vMatch").textContent = Math.max(0, Math.round(100 - de * 2)) + "%";
-    fillCommon(ti, la);
+    var lk = ti + ":" + sel.x + ":" + sel.y;
+    if (force || lk !== listKey) { fillCommon(ti, la, !!force); listKey = lk; }
   }
   // Карточка чистого Pantone-цвета: из сохранённых, гармоний и похожих.
   function openFree(ti) {
@@ -561,7 +563,7 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
     $("shTitle").textContent = "■ Pantone " + p[0];
     $("shSwR").style.background = "#" + p[2]; $("shSwR").style.color = inkOn(pr[0], pr[1], pr[2]); $("shLblR").textContent = "Pantone #" + p[2].toUpperCase();
     if (!$("palscreen").hidden) sheet.classList.add("over"); else sheet.classList.remove("over");
-    sheet.hidden = false; fillCommon(ti, null);
+    sheet.hidden = false; listKey = ""; fillCommon(ti, null, true);
     requestAnimationFrame(placeStrip);
   }
   function closeFree() {
@@ -636,9 +638,9 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
     var live = !!stream && showing === "live", again = has() && showing === "still";
     $("badge").textContent = live ? "Камера" : photoMode ? "Фото" : stream ? "Кадр" : "Камера выкл.";
     $("hint").hidden = !has() || !!sel;
-    $("start").hidden = has();
+    $("start").hidden = has(); $("dock").hidden = !has();
     var sh = $("btnShot"); sh.className = "shutter" + (again ? " again" : "");
-    sh.setAttribute("aria-label", !stream ? (photoMode ? "Включить камеру" : "Включить пантомизатор") : live ? "Снять кадр" : "Снять заново");
+    sh.setAttribute("aria-label", !stream ? "Включить камеру" : live ? "Снять кадр" : "Снять заново");
     $("shotIcon").textContent = again ? "↺" : "";
   }
   function stopStream() {
@@ -662,7 +664,7 @@ button:focus-visible, .finder:focus-visible, .size:focus-visible { outline: 3px 
       if (photoMode) toast("Нет доступа к камере");
       $("startNote").textContent = "Нет доступа к камере. Разрешите её в браузере и повторите."; $("startNote").hidden = false;
       setView(); refreshStill();
-    } finally { btn.disabled = false; btn.textContent = "Включить пантомизатор"; }
+    } finally { btn.disabled = false; btn.textContent = "Включить камеру"; }
   }
   function suspendCamera() { stopStream(); showing = "still"; if (sel) closeSheet(); setView(); refreshStill(); }
   function flashFx() { var f = $("flash"); f.classList.add("on"); setTimeout(function () { f.classList.remove("on"); }, 40); }
